@@ -1,6 +1,4 @@
-//! luars (Lua 5.5) backend for bevy_mod_scripting.
-//!
-//! Lives outside the BMS repo as an `IntoScriptPluginParams` plugin crate.
+#![doc = include_str!("../README.md")]
 
 use std::{
     any::TypeId,

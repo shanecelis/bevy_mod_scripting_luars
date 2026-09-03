@@ -1,4 +1,4 @@
-//! Spike: luars 0.26.2 with `unsafe-send`, host callbacks, and Nano-9 `builtin.lua`.
+//! luars 0.26.2 with `unsafe-send` and host callbacks.
 
 use luars::{Lua, LuaApi, SafeOption, Stdlib};
 
@@ -40,24 +40,11 @@ fn host_callback_and_eval() {
 }
 
 #[test]
-fn exec_nano9_builtin_lua() {
+fn stdlib_string_format() {
     let mut lua = new_lua();
-    lua.register_function("warn", |s: String| {
-        let _ = s;
-    })
-    .ok();
-    lua.load(include_str!("../../../src/builtin.lua"))
-        .set_name("builtin.lua")
-        .exec()
-        .unwrap_or_else(|e| panic!("builtin.lua failed: {:?}", lua.get_error_message(e)));
-    let band: i64 = lua
-        .load("return band(12, 10)")
+    let s: String = lua
+        .load(r#"return string.format("%d", 42)"#)
         .eval()
-        .expect("band from builtin.lua");
-    assert_eq!(band, 8);
-    let atan: f64 = lua
-        .load("return atan2(1, 0)")
-        .eval()
-        .expect("atan2 from builtin.lua");
-    assert!(atan.is_finite(), "atan2 returned {atan}");
+        .expect("string.format");
+    assert_eq!(s, "42");
 }
