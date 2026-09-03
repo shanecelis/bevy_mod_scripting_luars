@@ -5,12 +5,6 @@ A [Lua 5.5](https://www.lua.org/manual/5.5/) backend for
 [luars](https://github.com/CppCXY/lua-rs) that supports WASM instead of
 [mlua](https://github.com/mlua-rs/mlua), which does not support WASM yet.
 
-
-> [!CAUTION]
-> Early days. Published BMS 0.20 tracks Bevy 0.18. This crate needs the
-> `feat/bevy-0.19` branch, so keep a `[patch.crates-io]` until BMS publishes
-> Bevy 0.19. crates.io does not accept git dependencies in `[dependencies]`.
-
 ## Usage
 
 Leave BMS's bundled Lua (mlua) off. Add this plugin instead. 
