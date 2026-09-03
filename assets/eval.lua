@@ -1,0 +1,2 @@
+-- Shared REPL context for the `eval` example.
+-- Globals you assign (e.g. `x = 1`) stick around for later lines.

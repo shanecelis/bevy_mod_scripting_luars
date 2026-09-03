@@ -20,7 +20,6 @@ Leave BMS's bundled Lua (mlua) off. Add this plugin instead.
 bevy = "0.19"
 bevy_mod_scripting = { version = "0.21", default-features = false, features = ["core_functions"] }
 bevy_mod_scripting_luars = { git = "https://github.com/shanecelis/bevy_mod_scripting_luars" }
-
 ```
 
 ``` rust,ignore
@@ -42,12 +41,23 @@ pull in two Lua VMs.
 Assets with `.lua` and `.luau` suffixes load as Lua 5.5. `luars` is enabled with
 `unsafe-send` so the VM is `Send` for Bevy.
 
-## Example
+## Example: eval
 
-Type Lua into a Bevy window and see the result:
+A small Bevy window that acts as a Lua REPL. Type an expression, press Enter,
+and the result shows above the prompt. Globals persist for the session (assign
+`x = 3`, then evaluate `x * x`).
 
 ``` sh
 cargo run --example eval
+```
+
+Try:
+
+``` lua
+1 + 2
+string.upper("hi")
+x = 10
+x * x
 ```
 
 ## Wasm
