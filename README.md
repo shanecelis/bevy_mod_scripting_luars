@@ -13,30 +13,15 @@ A [Lua 5.5](https://www.lua.org/manual/5.5/) backend for
 
 ## Usage
 
-Leave BMS's bundled Lua (mlua) off. Add this plugin instead. Cargo `[patch]` is
-not inherited, so list the BMS branch in your root `Cargo.toml`:
+Leave BMS's bundled Lua (mlua) off. Add this plugin instead. 
 
 ``` toml
 [dependencies]
 bevy = "0.19"
-bevy_mod_scripting = { version = "0.20", default-features = false, features = ["core_functions"] }
+bevy_mod_scripting = { version = "0.21", default-features = false, features = ["core_functions"] }
 bevy_mod_scripting_luars = { git = "https://github.com/shanecelis/bevy_mod_scripting_luars" }
 
-[patch.crates-io]
-bevy_mod_scripting = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_asset = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_bindings = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_bindings_domain = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_core = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_derive = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_display = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_functions = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_script = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_world = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_system_reflection = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
 ```
-
-Drop these patches when BMS ships Bevy 0.19 (likely 0.21).
 
 ``` rust,ignore
 use bevy::prelude::*;
@@ -56,6 +41,14 @@ pull in two Lua VMs.
 
 Assets with `.lua` and `.luau` suffixes load as Lua 5.5. `luars` is enabled with
 `unsafe-send` so the VM is `Send` for Bevy.
+
+## Example
+
+Type Lua into a Bevy window and see the result:
+
+``` sh
+cargo run --example eval
+```
 
 ## Wasm
 

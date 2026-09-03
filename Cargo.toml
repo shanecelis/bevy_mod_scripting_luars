@@ -1,6 +1,6 @@
 [package]
 name = "bevy_mod_scripting_luars"
-description = "luars (Lua 5.5) language backend for bevy_mod_scripting"
+description = "luars (Lua 5.5) language backend for bevy_mod_scripting with WASM supportM"
 version = "0.1.0"
 edition = "2024"
 authors = ["Shane Celis <shane.celis@gmail.com>"]
@@ -11,9 +11,7 @@ repository = "https://github.com/shanecelis/bevy_mod_scripting_luars"
 documentation = "https://docs.rs/bevy_mod_scripting_luars"
 keywords = ["bevy", "lua", "scripting", "gamedev"]
 categories = ["game-development"]
-# crates.io 0.20 is Bevy 0.18. [patch] below swaps in `feat/bevy-0.19`.
-# Drop the patch (and this flag) when BMS publishes Bevy 0.19.
-publish = false
+publish = true
 
 [dependencies]
 bevy_app = { version = "0.19", default-features = false }
@@ -21,26 +19,35 @@ bevy_ecs = { version = "0.19", default-features = false }
 bevy_asset = { version = "0.19", default-features = false }
 bevy_log = { version = "0.19", default-features = false }
 bevy_platform = { version = "0.19", default-features = false }
-bevy_mod_scripting_core = "0.20"
-bevy_mod_scripting_display = "0.20"
-bevy_mod_scripting_bindings = "0.20"
-bevy_mod_scripting_bindings_domain = "0.20"
-bevy_mod_scripting_asset = "0.20"
-bevy_mod_scripting_script = "0.20"
-bevy_mod_scripting_world = "0.20"
+bevy_mod_scripting_core = "0.21"
+bevy_mod_scripting_display = "0.21"
+bevy_mod_scripting_bindings = "0.21"
+bevy_mod_scripting_bindings_domain = "0.21"
+bevy_mod_scripting_asset = "0.21"
+bevy_mod_scripting_script = "0.21"
+bevy_mod_scripting_world = "0.21"
 luars = { version = "0.26.2", features = ["unsafe-send"] }
+
+[dev-dependencies]
+bevy = "0.19"
+bevy_mod_scripting = { version = "0.21", default-features = false, features = ["core_functions"] }
+
+[[example]]
+name = "eval"
+path = "examples/eval.rs"
+doc-scrape-examples = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.3", features = ["wasm_js"] }
 js-sys = "0.3"
 
 [patch.crates-io]
-bevy_mod_scripting_asset = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_bindings = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_bindings_domain = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_core = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_derive = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_display = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_script = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_mod_scripting_world = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
-bevy_system_reflection = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
+# bevy_mod_scripting_asset = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
+# bevy_mod_scripting_bindings = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
+# bevy_mod_scripting_bindings_domain = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
+# bevy_mod_scripting_core = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
+# bevy_mod_scripting_derive = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
+# bevy_mod_scripting_display = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
+# bevy_mod_scripting_script = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
+# bevy_mod_scripting_world = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
+# bevy_system_reflection = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }
