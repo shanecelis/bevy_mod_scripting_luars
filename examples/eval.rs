@@ -1,12 +1,19 @@
 //! Type Lua expressions, press Enter, see the result on screen.
 //!
+//! Native:
 //! ```sh
-//! cargo run --example eval
+//! cargo run --example eval --features eval
+//! ```
+//!
+//! Browser (Trunk):
+//! ```sh
+//! trunk serve --config web/Trunk.toml
 //! ```
 //!
 //! Try: `1 + 2`, `string.format("%x", 255)`, `x = 10` then `x * 2`.
 
 use bevy::{
+    asset::AssetMetaCheck,
     input::{
         ButtonState,
         keyboard::{Key, KeyboardInput},
@@ -28,14 +35,26 @@ const HISTORY_CAP: usize = 24;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "bevy_mod_scripting_luars eval".into(),
-                resolution: (720, 480).into(),
-                ..default()
-            }),
-            ..default()
-        }))
+        .add_plugins(
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "bevy_mod_scripting_luars eval".into(),
+                        resolution: (720, 480).into(),
+                        #[cfg(target_arch = "wasm32")]
+                        canvas: Some("#bevy-canvas".into()),
+                        #[cfg(target_arch = "wasm32")]
+                        fit_canvas_to_parent: true,
+                        ..default()
+                    }),
+                    ..default()
+                })
+                .set(AssetPlugin {
+                    // Trunk does not serve Bevy `.meta` sidecars.
+                    meta_check: AssetMetaCheck::Never,
+                    ..default()
+                }),
+        )
         .add_plugins((BMSPlugin, LuarsScriptingPlugin::default()))
         .add_systems(Startup, setup)
         .add_systems(Update, (handle_keyboard, refresh_ui).chain())

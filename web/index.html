@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>bevy_mod_scripting_luars eval</title>
+    <style>
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: #111;
+        overflow: hidden;
+      }
+      #bevy-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        outline: none;
+      }
+    </style>
+    <link
+      data-trunk
+      rel="rust"
+      href="../Cargo.toml"
+      data-bin="eval"
+      data-cargo-features="eval"
+      data-wasm-opt="0"
+    />
+    <link data-trunk rel="copy-dir" href="../assets" data-target-path="assets" />
+  </head>
+  <body>
+    <canvas id="bevy-canvas" tabindex="0"></canvas>
+  </body>
+</html>

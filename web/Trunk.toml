@@ -1,0 +1,13 @@
+# Browser build for the eval REPL.
+#
+#   trunk serve --config web/Trunk.toml
+#
+# wasm32 rustflags (stack size + getrandom) live in .cargo/config.toml.
+
+[build]
+target = "index.html"
+dist = "../dist"
+
+[serve]
+port = 8080
+open = false

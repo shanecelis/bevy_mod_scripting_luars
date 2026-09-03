@@ -1,6 +1,6 @@
 [package]
 name = "bevy_mod_scripting_luars"
-description = "luars (Lua 5.5) language backend for bevy_mod_scripting with WASM supportM"
+description = "luars (Lua 5.5) language backend for bevy_mod_scripting with WASM support"
 version = "0.1.0"
 edition = "2024"
 authors = ["Shane Celis <shane.celis@gmail.com>"]
@@ -12,6 +12,7 @@ documentation = "https://docs.rs/bevy_mod_scripting_luars"
 keywords = ["bevy", "lua", "scripting", "gamedev"]
 categories = ["game-development"]
 publish = true
+exclude = ["web/", "dist/"]
 
 [dependencies]
 bevy_app = { version = "0.19", default-features = false }
@@ -27,15 +28,24 @@ bevy_mod_scripting_asset = "0.21"
 bevy_mod_scripting_script = "0.21"
 bevy_mod_scripting_world = "0.21"
 luars = { version = "0.26.2", features = ["unsafe-send"] }
+bevy = { version = "0.19", optional = true }
+bevy_mod_scripting = { version = "0.21", default-features = false, features = ["core_functions"], optional = true }
 
-[dev-dependencies]
-bevy = "0.19"
-bevy_mod_scripting = { version = "0.21", default-features = false, features = ["core_functions"] }
+[features]
+default = []
+# Bevy + BMS for the eval REPL (native example and trunk wasm bin).
+eval = ["dep:bevy", "dep:bevy_mod_scripting"]
 
 [[example]]
 name = "eval"
 path = "examples/eval.rs"
+required-features = ["eval"]
 doc-scrape-examples = true
+
+[[bin]]
+name = "eval"
+path = "examples/eval.rs"
+required-features = ["eval"]
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.3", features = ["wasm_js"] }
