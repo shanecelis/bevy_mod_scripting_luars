@@ -1,6 +1,6 @@
 [package]
 name = "bevy_mod_scripting_luars"
-description = "luars (Lua 5.5) language backend for bevy_mod_scripting with WASM support"
+description = "A luars backend for bevy_mod_scripting with WASM support"
 version = "0.1.0"
 edition = "2024"
 authors = ["Shane Celis <shane.celis@gmail.com>"]

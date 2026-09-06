@@ -169,12 +169,12 @@ impl AsMut<ScriptingPlugin<Self>> for LuarsScriptingPlugin {
 ///
 /// # What scripts see
 ///
-/// Each context gets:
-/// - `world` — static handle to Bevy's [`World`]
-/// - `entity` — the entity the script is attached to, when there is one
-/// - `script_asset` — the [`Handle<ScriptAsset>`] for this script
-/// - `register_callback(name, fn)` — subscribe a Lua function to a BMS callback
-/// - every global and global-namespace function from the BMS registries
+/// Each context gets
+/// - `world`, a static handle to Bevy's [`World`];
+/// - `entity`, the entity the script is attached to, when there is one;
+/// - `script_asset`, the [`Handle<ScriptAsset>`] for this script;
+/// - `register_callback(name, fn)`, subscribe a Lua function to a BMS callback; and
+/// - every global and global-namespace function from the BMS registries.
 ///
 /// Configure with [`bevy_mod_scripting_core::ConfigureScriptPlugin`]
 /// (`set_context_policy`, `add_context_initializer`, and so on).

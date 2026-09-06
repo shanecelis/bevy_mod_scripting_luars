@@ -5,8 +5,6 @@ A [luars](https://github.com/CppCXY/lua-rs) backend for
 supports WASM instead of [mlua](https://github.com/mlua-rs/mlua), which does not
 support WASM yet.
 
-[▶ Run the WASM demo](https://shanecelis.github.io/bevy_mod_scripting_luars/)
-
 ## Usage
 
 Leave BMS's bundled Lua (mlua) off. Add this plugin instead. 
@@ -42,21 +40,23 @@ Assets with `.lua` and `.luau` suffixes load as Lua 5.5.
 
 ## Library API
 
-`LuarsScriptingPlugin` is the whole product for most apps. Add it, load scripts
-the BMS way, and stop. Scripts see `world`, `entity`, `script_asset`,
-`register_callback`, and whatever BMS registered as globals.
+`LuarsScriptingPlugin` is the whole product for most apps. Add it and load
+scripts the BMS way. Scripts see `world`, `entity`, `script_asset`,
+`register_callback`, and any other globals registered with BMS.
 
-Reach past the plugin only when you need the VM:
+These types are for talking to the VM:
 
-| Item | When you need it |
-|------|------------------|
-| `LuarsContext` | `ScriptContexts` gave you the VM; deref to `luars::Lua` |
-| `luars` | Types from the Luars crate (`LuaApi`, `LuaError`, …) |
-| `LuaScriptValue` / `MultiLuaScriptValue` | `eval` / `eval_multi` in BMS values |
-| `into_bms_error` | Turn a `LuaError` into a readable BMS error |
-| `LuaReflectReference` / `LuaStaticReflectReference` | Inject a reflected value or type into a context |
+| Item                          | When you need it                                        |
+|-------------------------------|---------------------------------------------------------|
+| `LuarsContext`                | `ScriptContexts` gave you the VM; deref to `luars::Lua` |
+| `luars`                       | Re-export of the Luars crate (`LuaApi`, `LuaError`, …)  |
+| `(Multi)LuaScriptValue`       | `eval` / `eval_multi` in BMS values                     |
+| `into_bms_error`              | Turn a `LuaError` into a readable BMS error             |
+| `Lua(Static)ReflectReference` | Inject a reflected value or type into a context         |
 
 ## Example: eval
+
+[▶ Run the WASM demo](https://shanecelis.github.io/bevy_mod_scripting_luars/)
 
 A small Bevy window that acts as a Lua REPL. Type an expression, press Enter,
 and the result shows above the prompt. Globals persist for the session (assign
