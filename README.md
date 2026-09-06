@@ -5,6 +5,8 @@ A [luars](https://github.com/CppCXY/lua-rs) backend for
 supports WASM instead of [mlua](https://github.com/mlua-rs/mlua), which does not
 support WASM yet.
 
+[▶ Run the WASM demo](https://shanecelis.github.io/bevy_mod_scripting_luars/)
+
 ## Usage
 
 Leave BMS's bundled Lua (mlua) off. Add this plugin instead. 

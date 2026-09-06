@@ -8,6 +8,8 @@
 [build]
 target = "index.html"
 dist = "../dist"
+# Relative so GitHub Pages works under /bevy_mod_scripting_luars/.
+public_url = "./"
 minify = "on_release"
 
 [serve]
