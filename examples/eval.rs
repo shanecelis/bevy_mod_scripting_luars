@@ -165,10 +165,8 @@ fn handle_keyboard(
             Key::Space => {
                 repl.input.push(' ');
             }
-            Key::Character(c) => {
-                if !c.chars().any(char::is_control) {
-                    repl.input.push_str(c);
-                }
+            Key::Character(c) if !c.chars().any(char::is_control) => {
+                repl.input.push_str(c);
             }
             _ => {}
         }
@@ -243,7 +241,11 @@ fn format_value(v: &ScriptValue) -> String {
         ScriptValue::Float(f) => f.to_string(),
         ScriptValue::String(s) => format!("{s:?}"),
         ScriptValue::List(items) => {
-            let inner = items.iter().map(format_value).collect::<Vec<_>>().join(", ");
+            let inner = items
+                .iter()
+                .map(format_value)
+                .collect::<Vec<_>>()
+                .join(", ");
             format!("[{inner}]")
         }
         ScriptValue::Tuple(t) => {

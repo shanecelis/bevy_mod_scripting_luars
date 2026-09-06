@@ -16,8 +16,7 @@ use luars::{
 use crate::reference::{BoundScriptFunction, LuaReflectReference, LuaStaticReflectReference};
 
 /// Caller context used for Lua → BMS function dispatch.
-pub(crate) const LUA_CALLER_CONTEXT: FunctionCallContext =
-    FunctionCallContext::new(Language::Lua);
+pub(crate) const LUA_CALLER_CONTEXT: FunctionCallContext = FunctionCallContext::new(Language::Lua);
 
 /// Several [`ScriptValue`]s, for Lua's multiple return values.
 ///

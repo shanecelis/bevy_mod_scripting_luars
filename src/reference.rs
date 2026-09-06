@@ -294,4 +294,3 @@ impl UserDataTrait for LuaStaticReflectReference {
         self
     }
 }
-
