@@ -1,12 +1,14 @@
 # Browser build for the eval REPL.
 #
-#   trunk serve --config web/Trunk.toml
+#   trunk serve --config web/Trunk.toml              # debug
+#   trunk serve --config web/Trunk.toml --release    # wasm-release + wasm-opt
 #
 # wasm32 rustflags (stack size + getrandom) live in .cargo/config.toml.
 
 [build]
 target = "index.html"
 dist = "../dist"
+minify = "on_release"
 
 [serve]
 port = 8080

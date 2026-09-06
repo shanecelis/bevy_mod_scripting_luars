@@ -28,7 +28,10 @@ bevy_mod_scripting_asset = "0.21"
 bevy_mod_scripting_script = "0.21"
 bevy_mod_scripting_world = "0.21"
 luars = { version = "0.26.2", features = ["unsafe-send"] }
-bevy = { version = "0.19", optional = true }
+bevy = { version = "0.19", optional = true, default-features = false, features = [
+    "2d",
+    "ui",
+] }
 bevy_mod_scripting = { version = "0.21", default-features = false, features = ["core_functions"], optional = true }
 
 [features]
@@ -50,6 +53,16 @@ required-features = ["eval"]
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.3", features = ["wasm_js"] }
 js-sys = "0.3"
+
+# Size-focused profile for `trunk --release` / `cargo_profile = "wasm-release"`.
+# Does not change native `cargo run --release`.
+[profile.wasm-release]
+inherits = "release"
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
 
 [patch.crates-io]
 # bevy_mod_scripting_asset = { git = "https://github.com/makspll/bevy_mod_scripting.git", branch = "feat/bevy-0.19" }

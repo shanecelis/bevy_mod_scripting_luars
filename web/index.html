@@ -24,7 +24,9 @@
       href="../Cargo.toml"
       data-bin="eval"
       data-cargo-features="eval"
-      data-wasm-opt="0"
+      data-cargo-profile-release="wasm-release"
+      data-wasm-opt="z"
+      data-wasm-opt-params="--enable-bulk-memory --enable-nontrapping-float-to-int --enable-sign-ext"
     />
     <link data-trunk rel="copy-dir" href="../assets" data-target-path="assets" />
   </head>

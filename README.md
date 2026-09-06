@@ -69,14 +69,16 @@ cargo run --example eval --features eval
 ### WASM
 
 Run the eval example in the browser (needs trunk and the
-`wasm32-unknown-unknown` target).
+`wasm32-unknown-unknown` target). Debug wasm is hundreds of MiB. Pass
+`--release` for a smaller wasm, but it takes longer.
 
 ``` sh
-trunk serve --config web/Trunk.toml
+trunk serve --config web/Trunk.toml; # Debug. Fast but big: ~290MiB.
+trunk serve --config web/Trunk.toml --release; # Release. Slow but small: ~18MiB.
 ```
 
 Then open http://localhost:8080/. Click the canvas so it receives keyboard
-focus.
+focus. Host a release build with gzip or brotli; that shrinks transfer further.
 
 Try:
 
