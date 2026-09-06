@@ -1,4 +1,5 @@
 #![doc = include_str!("../README.md")]
+#![warn(missing_docs)]
 
 use std::{
     any::TypeId,
@@ -31,19 +32,44 @@ use bevy_mod_scripting_script::ScriptAttachment;
 use bevy_mod_scripting_world::ThreadWorldContainer;
 use luars::{Lua, LuaApi, LuaError, LuaFunction, LuaResult, SafeOption, Stdlib};
 
-pub mod reference;
-pub mod script_value;
+mod reference;
+mod script_value;
 
+/// The [luars](https://docs.rs/luars) crate this backend embeds.
+///
+/// Import `LuaApi`, `LuaError`, and friends from here instead of taking a
+/// direct `luars` dependency.
 pub use luars;
 pub use reference::{LuaReflectReference, LuaStaticReflectReference};
-pub use script_value::{LUA_CALLER_CONTEXT, LuaScriptValue, MultiLuaScriptValue};
+pub use script_value::{LuaScriptValue, MultiLuaScriptValue};
 
 make_plugin_config_static!(LuarsScriptingPlugin);
 
-/// Lua VM handle stored as the BMS context.
+/// Per-script Lua 5.5 VM, stored as BMS's language context.
+///
+/// Most apps never construct this. Add [`LuarsScriptingPlugin`] and talk to
+/// scripts through BMS (`ScriptComponent`, callback events, registered
+/// functions). Reach for this type when you need the raw VM — a REPL, an extra
+/// `set_global`, a one-off `load`.
+///
+/// Get a loaded context from `ScriptContexts<LuarsScriptingPlugin>`, then
+/// dereference to [`luars::Lua`].
+///
+/// ```ignore
+/// fn eval(contexts: Res<ScriptContexts<LuarsScriptingPlugin>>) {
+///     let inner = contexts.read();
+///     let Some((_, ctx)) = inner.first_resident_from_each_context().next() else {
+///         return;
+///     };
+///     let Some(arc) = ctx.as_loaded() else {
+///         return;
+///     };
+///     let mut lua = arc.lock();
+///     let n: i64 = lua.load("return 1 + 2").eval().unwrap();
+/// }
+/// ```
 pub struct LuarsContext {
-    pub lua: Lua,
-    pub last_loaded_script_name: Option<String>,
+    lua: Lua,
 }
 
 impl Deref for LuarsContext {
@@ -63,12 +89,11 @@ impl LuarsContext {
     fn new() -> Result<Self, InteropError> {
         let mut lua = Lua::new(SafeOption::default());
         open_host_stdlibs(&mut lua).map_err(|e| lua_to_interop(&mut lua, e))?;
-        Ok(Self {
-            lua,
-            last_loaded_script_name: None,
-        })
+        Ok(Self { lua })
     }
 
+    /// Turn a luars [`LuaResult`] into a BMS [`InteropError`] using this VM's
+    /// stored error message.
     pub fn map_lua<T>(&mut self, result: LuaResult<T>) -> Result<T, InteropError> {
         result.map_err(|e| lua_to_interop(&mut self.lua, e))
     }
@@ -124,8 +149,39 @@ impl AsMut<ScriptingPlugin<Self>> for LuarsScriptingPlugin {
     }
 }
 
-/// BMS language plugin backed by luars instead of mlua.
+/// BMS language plugin that runs Lua 5.5 via [luars] instead of mlua.
+///
+/// Add this next to `BMSPlugin`. Leave BMS's `lua` / `lua54` features off so
+/// you do not load two Lua VMs.
+///
+/// ```ignore
+/// use bevy::prelude::*;
+/// use bevy_mod_scripting::BMSPlugin;
+/// use bevy_mod_scripting_luars::LuarsScriptingPlugin;
+///
+/// App::new()
+///     .add_plugins((BMSPlugin, LuarsScriptingPlugin::default()))
+///     .run();
+/// ```
+///
+/// After that, treat this like any other BMS language: load `.lua` / `.luau`
+/// assets and attach them with `ScriptComponent`.
+///
+/// # What scripts see
+///
+/// Each context gets:
+/// - `world` — static handle to Bevy's [`World`]
+/// - `entity` — the entity the script is attached to, when there is one
+/// - `script_asset` — the [`Handle<ScriptAsset>`] for this script
+/// - `register_callback(name, fn)` — subscribe a Lua function to a BMS callback
+/// - every global and global-namespace function from the BMS registries
+///
+/// Configure with [`bevy_mod_scripting_core::ConfigureScriptPlugin`]
+/// (`set_context_policy`, `add_context_initializer`, and so on).
+///
+/// [luars]: https://docs.rs/luars
 pub struct LuarsScriptingPlugin {
+    /// Inner BMS plugin. Prefer `ConfigureScriptPlugin` helpers when you can.
     pub scripting_plugin: ScriptingPlugin<Self>,
 }
 
@@ -334,7 +390,6 @@ fn luars_context_load(
     world_id: WorldId,
 ) -> Result<LuarsContext, InteropError> {
     let mut context = LuarsContext::new()?;
-    context.last_loaded_script_name = context_key.script().path().map(|p| p.to_string());
     load_lua_content_into_context(&mut context, context_key, content, world_id)?;
     Ok(context)
 }
@@ -382,7 +437,11 @@ fn luars_handler(
         .map_err(|e| lua_to_interop(&mut context.lua, e))
 }
 
-/// Convert a luars error into a BMS [`InteropError`] using the VM's stored message.
+/// Convert a luars [`LuaError`] into a BMS [`InteropError`] using the VM's
+/// stored message.
+///
+/// Prefer [`LuarsContext::map_lua`] when you already have a context. Use this
+/// when you only have a [`Lua`].
 pub fn into_bms_error(lua: &mut Lua, e: LuaError) -> InteropError {
     lua_to_interop(lua, e)
 }

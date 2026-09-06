@@ -4,7 +4,7 @@ use std::any::{Any, TypeId};
 use std::collections::VecDeque;
 
 use bevy_mod_scripting_bindings::{
-    InteropError, ReflectReference, WorldExtensions,
+    ReflectReference, WorldExtensions,
     function::script_function::{DynamicScriptFunction, DynamicScriptFunctionMut},
     script_value::ScriptValue,
 };
@@ -15,23 +15,35 @@ use luars::{CFunction, LuaResult, LuaState, UdValue, UserDataTrait};
 
 use crate::script_value::{LUA_CALLER_CONTEXT, lua_value_to_script, script_value_into_lua};
 
-/// Userdata wrapper around [`ReflectReference`].
+/// Lua userdata for a live [`ReflectReference`].
+///
+/// Scripts already receive these as `entity` and `script_asset`. Construct one
+/// only if you are injecting another reflected value into a context yourself.
 #[derive(Debug, Clone)]
-pub struct LuaReflectReference(pub ReflectReference);
+pub struct LuaReflectReference(
+    /// The BMS reflect handle.
+    pub ReflectReference,
+);
 
-/// Static type handle so scripts can call `Entity.from_raw(...)`.
+/// Lua userdata for a type, so scripts can call `Entity.from_raw(...)`.
+///
+/// The plugin installs `world` this way. Use it from a context initializer if
+/// you need to expose another type's associated functions.
 #[derive(Debug, Clone, Copy)]
-pub struct LuaStaticReflectReference(pub TypeId);
+pub struct LuaStaticReflectReference(
+    /// Type to look up in the BMS function registry.
+    pub TypeId,
+);
 
 /// Callable userdata wrapping a BMS dynamic function.
 #[derive(Clone)]
-pub enum BoundScriptFunction {
+pub(crate) enum BoundScriptFunction {
     Fn(DynamicScriptFunction),
     FnMut(DynamicScriptFunctionMut),
 }
 
 impl BoundScriptFunction {
-    pub fn into_script_value(self) -> ScriptValue {
+    pub(crate) fn into_script_value(self) -> ScriptValue {
         match self {
             BoundScriptFunction::Fn(f) => ScriptValue::Function(f),
             BoundScriptFunction::FnMut(f) => ScriptValue::FunctionMut(f),
@@ -283,7 +295,3 @@ impl UserDataTrait for LuaStaticReflectReference {
     }
 }
 
-/// Convert an interop error into a Lua runtime error.
-pub fn interop_to_lua(e: InteropError) -> String {
-    e.to_string()
-}

@@ -1,9 +1,9 @@
 # bevy_mod_scripting_luars
 
-A [Lua 5.5](https://www.lua.org/manual/5.5/) backend for
-[bevy_mod_scripting](https://github.com/makspll/bevy_mod_scripting), using
-[luars](https://github.com/CppCXY/lua-rs) that supports WASM instead of
-[mlua](https://github.com/mlua-rs/mlua), which does not support WASM yet.
+A [luars](https://github.com/CppCXY/lua-rs) backend for
+[bevy_mod_scripting](https://github.com/makspll/bevy_mod_scripting) that
+supports WASM instead of [mlua](https://github.com/mlua-rs/mlua), which does not
+support WASM yet.
 
 ## Usage
 
@@ -32,8 +32,27 @@ fn main() {
 Do not enable BMS `lua` or `lua54` features alongside this crate; that would
 pull in two Lua VMs.
 
-Assets with `.lua` and `.luau` suffixes load as Lua 5.5. `luars` is enabled with
-`unsafe-send` so the VM is `Send` for Bevy.
+Assets with `.lua` and `.luau` suffixes load as Lua 5.5.
+
+### Technical Note
+
+`luars` is enabled with `unsafe-send` so the VM is `Send` for Bevy.
+
+## Library API
+
+`LuarsScriptingPlugin` is the whole product for most apps. Add it, load scripts
+the BMS way, and stop. Scripts see `world`, `entity`, `script_asset`,
+`register_callback`, and whatever BMS registered as globals.
+
+Reach past the plugin only when you need the VM:
+
+| Item | When you need it |
+|------|------------------|
+| `LuarsContext` | `ScriptContexts` gave you the VM; deref to `luars::Lua` |
+| `luars` | Types from the Luars crate (`LuaApi`, `LuaError`, …) |
+| `LuaScriptValue` / `MultiLuaScriptValue` | `eval` / `eval_multi` in BMS values |
+| `into_bms_error` | Turn a `LuaError` into a readable BMS error |
+| `LuaReflectReference` / `LuaStaticReflectReference` | Inject a reflected value or type into a context |
 
 ## Example: eval
 
@@ -77,6 +96,12 @@ table, utf8, coroutine, package, and debug. Not `io` or `os`.
 binary is linked with a 16MB stack. Trunk copies `assets/` next to the wasm so
 `eval.lua` loads in the browser.
 
+## Compatibility
+
+| bevy_mod_scripting_luars | bms  | bevy |
+|--------------------------|------|------|
+| 0.1.0                    | 0.21 | 0.19 |
+
 ## Provenance
 
 This project was extracted from the
@@ -86,7 +111,7 @@ This project was extracted from the
 
 Licensed under either of
 
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.

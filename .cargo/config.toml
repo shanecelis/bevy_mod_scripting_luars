@@ -1,0 +1,7 @@
+[target.wasm32-unknown-unknown]
+rustflags = [
+  # luars needs a large stack for Lua on wasm.
+  "-C", "link-arg=-zstack-size=16777216",
+  # getrandom 0.3+ / Bevy wasm RNG
+  "--cfg", "getrandom_backend=\"wasm_js\"",
+]

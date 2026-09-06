@@ -16,12 +16,21 @@ use luars::{
 use crate::reference::{BoundScriptFunction, LuaReflectReference, LuaStaticReflectReference};
 
 /// Caller context used for Lua → BMS function dispatch.
-pub const LUA_CALLER_CONTEXT: FunctionCallContext = FunctionCallContext::new(Language::Lua);
+pub(crate) const LUA_CALLER_CONTEXT: FunctionCallContext =
+    FunctionCallContext::new(Language::Lua);
 
-/// Wrapper around many [`ScriptValue`]s for Lua multi-return.
-pub struct MultiLuaScriptValue(pub VecDeque<ScriptValue>);
+/// Several [`ScriptValue`]s, for Lua's multiple return values.
+///
+/// Pass this as the `eval_multi` / `FromLuaMulti` type when a chunk can return
+/// more than one value. Collapse to a single BMS value with
+/// [`Self::into_script_value`].
+pub struct MultiLuaScriptValue(
+    /// Values in Lua return order.
+    pub VecDeque<ScriptValue>,
+);
 
 impl MultiLuaScriptValue {
+    /// One value, a [`ScriptValue::Tuple`], or [`ScriptValue::Unit`] if empty.
     pub fn into_script_value(mut self) -> ScriptValue {
         if self.0.is_empty() {
             ScriptValue::Unit
@@ -32,6 +41,7 @@ impl MultiLuaScriptValue {
         }
     }
 
+    /// Wrap a BMS value, flattening an existing tuple.
     pub fn from_script_value(value: ScriptValue) -> Self {
         if let ScriptValue::Tuple(VariadicTuple(tuple)) = value {
             Self(tuple)
@@ -52,8 +62,15 @@ impl FromLuaMulti for MultiLuaScriptValue {
 }
 
 /// A [`ScriptValue`] that converts through luars [`FromLua`] / [`IntoLua`].
+///
+/// Use this as an `eval` return type (or `set_global` argument) when you want
+/// BMS values rather than raw Lua types. You do not need this to run scripts
+/// through BMS — only when talking to the VM yourself.
 #[derive(Debug, Clone)]
-pub struct LuaScriptValue(pub ScriptValue);
+pub struct LuaScriptValue(
+    /// The wrapped BMS value.
+    pub ScriptValue,
+);
 
 impl Deref for LuaScriptValue {
     type Target = ScriptValue;
@@ -95,7 +112,10 @@ impl IntoLua for LuaScriptValue {
     }
 }
 
-pub fn lua_value_to_script(state: &mut LuaState, value: LuaValue) -> Result<ScriptValue, String> {
+pub(crate) fn lua_value_to_script(
+    state: &mut LuaState,
+    value: LuaValue,
+) -> Result<ScriptValue, String> {
     if value.is_nil() {
         return Ok(ScriptValue::Unit);
     }
@@ -168,7 +188,7 @@ pub fn lua_value_to_script(state: &mut LuaState, value: LuaValue) -> Result<Scri
     Err(format!("unsupported lua value type {}", value.type_name()))
 }
 
-pub fn script_value_into_lua(state: &mut LuaState, value: ScriptValue) -> LuaResult<usize> {
+pub(crate) fn script_value_into_lua(state: &mut LuaState, value: ScriptValue) -> LuaResult<usize> {
     match value {
         ScriptValue::Unit => {
             state.push_value(LuaValue::nil())?;

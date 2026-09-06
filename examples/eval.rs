@@ -201,11 +201,10 @@ fn eval_as_expression(
 ) -> Result<String, String> {
     let source = format!("return {line}");
     let multi: MultiLuaScriptValue = lua
-        .lua
         .load(&source)
         .set_name("=eval")
         .eval_multi()
-        .map_err(|e| format_lua_error(&mut lua.lua, e))?;
+        .map_err(|e| format_lua_error(lua, e))?;
     Ok(format_multi(multi))
 }
 
@@ -213,15 +212,14 @@ fn eval_as_statement(
     lua: &mut bevy_mod_scripting_luars::LuarsContext,
     line: &str,
 ) -> Result<String, String> {
-    lua.lua
-        .load(line)
+    lua.load(line)
         .set_name("=eval")
         .exec()
-        .map_err(|e| format_lua_error(&mut lua.lua, e))?;
+        .map_err(|e| format_lua_error(lua, e))?;
     Ok("ok".into())
 }
 
-fn format_lua_error(lua: &mut bevy_mod_scripting_luars::luars::Lua, e: LuaError) -> String {
+fn format_lua_error(lua: &mut bevy_mod_scripting_luars::LuarsContext, e: LuaError) -> String {
     into_bms_error(lua, e).to_string()
 }
 
